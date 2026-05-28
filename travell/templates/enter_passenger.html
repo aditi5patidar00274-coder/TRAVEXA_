@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Passenger Details | Travexa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <h2 class="page-title">Enter Passenger Details</h2>
+
+    <div class="form-card">
+        <form method="POST" action="/payment">
+            <input type="text" name="name" placeholder="Passenger Name" required>
+            <input type="number" name="age" placeholder="Age" required>
+            <div style="display: flex; gap: 10px; margin: 10px 0;">
+                <select name="country_code" style="width: 100px; margin: 0;" required>
+                    <option value="+91">+91 (IN)</option>
+                    <option value="+1">+1 (US/CA)</option>
+                    <option value="+44">+44 (UK)</option>
+                    <option value="+61">+61 (AU)</option>
+                    <option value="+49">+49 (DE)</option>
+                    <option value="+33">+33 (FR)</option>
+                    <option value="+81">+81 (JP)</option>
+                    <option value="+86">+86 (CN)</option>
+                    <option value="+971">+971 (UAE)</option>
+                    <option value="+65">+65 (SG)</option>
+                    <option value="+60">+60 (MY)</option>
+                    <option value="+62">+62 (ID)</option>
+                    <option value="+66">+66 (TH)</option>
+                    <option value="+82">+82 (KR)</option>
+                    <option value="+7">+7 (RU)</option>
+                    <option value="+55">+55 (BR)</option>
+                    <option value="+27">+27 (ZA)</option>
+                    <option value="+34">+34 (ES)</option>
+                    <option value="+39">+39 (IT)</option>
+                    <option value="+41">+41 (CH)</option>
+                    <option value="+31">+31 (NL)</option>
+                    <option value="+46">+46 (SE)</option>
+                    <option value="+47">+47 (NO)</option>
+                    <option value="+45">+45 (DK)</option>
+                    <option value="+353">+353 (IE)</option>
+                    <option value="+64">+64 (NZ)</option>
+                    <option value="+20">+20 (EG)</option>
+                    <option value="+966">+966 (SA)</option>
+                    <option value="+90">+90 (TR)</option>
+                </select>
+                <input type="tel" name="mobile" placeholder="Mobile Number (10 digits)" pattern="[0-9]{10}"
+                    title="Please enter a valid 10-digit mobile number" required style="margin: 0; flex: 1;">
+            </div>
+
+            <input type="email" name="email" placeholder="Email Address"
+                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Please enter a valid email address" required>
+
+            <select name="gender" required>
+                <option value="">Select Gender</option>
+                <option>Male</option>
+                <option>Female</option>
+                <option>Other</option>
+            </select>
+
+
+
+            <button type="submit" class="btn btn-primary mt-4">
+                Proceed to Payment
+            </button>
+        </form>
+
+        <button class="btn back-btn" onclick="history.back()">
+            ⬅ Back
+        </button>
+    </div>
+
+</body>
+
+</html>

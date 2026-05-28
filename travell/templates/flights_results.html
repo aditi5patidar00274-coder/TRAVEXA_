@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Flight Results | Travexa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <header class="main-header" style="margin-bottom: 20px; padding: 15px; display:flex; justify-content:space-between; align-items:center;">
+        <h1 style="color:#000; font-size:1.8rem; margin:0; padding-left:20px;">
+            <span class="brand-box"
+                style="padding: 4px 12px; border-radius: 8px; font-size:1.5rem; transform:none; margin-right:4px; background: #ef4444; color: white;">TRAV</span>exa
+            <span style="font-weight:400; font-size:1.2rem; color: #6b7280; font-family: Inter;">flights</span>
+        </h1>
+        <a href="/home" class="logout-link" style="top:25px; right:20px;">Dashboard</a>
+    </header>
+
+    <div style="max-width:1200px; margin:0 auto; padding:0 20px 20px;">
+        <h2 style="font-size: 2.2rem; color:var(--text-main); margin-bottom:10px;">{{ from_city }} ➔ {{ to_city }}</h2>
+    </div>
+
+
+    {% if api_error %}
+    <div
+        style="max-width:800px; margin: 40px auto; padding: 25px; background: #FEF2F2; border: 1px solid #FCA5A5; border-radius: 12px; text-align: center;">
+        <h3 style="color: #991B1B; margin-bottom: 10px;">⚠️ API Problem Detected</h3>
+        <p style="color: #B91C1C; font-weight: 500;">{{ api_error }}</p>
+        <p style="margin-top:15px; font-size:0.9rem; color: #7F1D1D;">Note: Real-time search is currently mandatory.
+            Please verify your Amadeus API credentials.</p>
+        <a href="/flights-search" class="btn back-btn" style="margin-top:20px;">Try Different Search</a>
+    </div>
+    {% endif %}
+
+    {% if no_match and not api_error %}
+    <p class="page-title text-center" style="color:var(--accent);">
+        No flights available for this route right now.
+    </p>
+    {% endif %}
+
+    <div style="max-width:1200px; margin:0 auto; padding: 0 20px 60px;" id="flightsList">
+
+
+        {% for flight in flights %}
+        <!-- Data attributes for JS filtering -->
+        <div class="flight-container-wrapper" data-stops="{{ flight.stops }}"
+            data-hour="{{ flight.departure_raw[11:13] }}">
+
+            <div style="margin-bottom: 30px;">
+                <div class="bus-horizontal-card"
+                    style="margin-bottom: 0; border-bottom-left-radius:0; border-bottom-right-radius:0;">
+
+                    <div class="bus-details-left">
+                        <div class="bus-title">{{ flight.airline }}</div>
+                        <div style="color:var(--text-muted); font-size:0.9rem; margin-bottom:10px;">
+                            Flight No: {{ flight.flight_no }}
+                        </div>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <!-- Ratings Removed -->
+                        </div>
+                    </div>
+
+                    <div class="bus-details-middle">
+                        <div>
+                            <div class="bus-time-large" style="font-size: 1.3rem;">{{ flight.departure_display.split(' |
+                                ')[1] }}</div>
+                            <div style="font-size:0.85rem; color:var(--text-muted);">{{ flight.departure_display.split('
+                                | ')[0] }}</div>
+                            <div style="font-size:0.9rem; font-weight:700; color:var(--text-main); margin-top:4px;">{{
+                                flight.from }}</div>
+                        </div>
+                        <div style="text-align:center;">
+                            <div class="bus-duration-badge"
+                                style="background:#f0f7ff; color:var(--primary); font-weight:600;">✈️ {{ flight.duration
+                                }} • {{ flight.stops }}</div>
+                            <div style="margin-top:5px; color:#D1D5DB; letter-spacing:2px;">────────</div>
+                        </div>
+                        <div>
+                            <div class="bus-time-large" style="font-size: 1.3rem;">{{ flight.arrival_display.split(' |
+                                ')[1] }}</div>
+                            <div style="font-size:0.85rem; color:var(--text-muted);">{{ flight.arrival_display.split(' |
+                                ')[0] }}</div>
+                            <div style="font-size:0.9rem; font-weight:700; color:var(--text-main); margin-top:4px;">{{
+                                flight.to }}</div>
+                        </div>
+                    </div>
+
+                    <div class="bus-details-right">
+                        <div style="color:var(--text-muted); font-size:0.85rem;">Price per adult</div>
+                        <div>
+                            <span class="bus-price-final">₹{{ "{:,}".format(flight.price) }}</span>
+                        </div>
+
+                        {% if flight.status == "Available" %}
+                        <form method="POST" action="/enter-passenger" style="margin-top:10px;">
+                            <input type="hidden" name="airline" value="{{ flight.airline }}">
+                            <input type="hidden" name="flight_no" value="{{ flight.flight_no }}">
+                            <input type="hidden" name="from_city" value="{{ flight.from }}">
+                            <input type="hidden" name="to_city" value="{{ flight.to }}">
+                            <input type="hidden" name="departure" value="{{ flight.departure_raw }}">
+                            <input type="hidden" name="arrival" value="{{ flight.arrival_raw }}">
+                            <input type="hidden" name="price" value="{{ flight.price }}">
+                            <input type="hidden" name="status" value="{{ flight.status }}">
+                            <button class="btn book-btn" type="submit" style="margin-top:0; padding: 10px 30px;">
+                                Book
+                            </button>
+                        </form>
+                        {% elif flight.status == "Delayed" and flight.within_two_hours %}
+                        <button class="btn book-btn" disabled style="margin-top:10px; padding: 10px 30px;">
+                            Taking Off
+                        </button>
+                        <p class="text-center" style="color:var(--accent); font-size:12px; margin-top:5px;">Booking
+                            Closed</p>
+                        {% else %}
+                        <form method="POST" action="/enter-passenger" style="margin-top:10px;">
+                            <input type="hidden" name="airline" value="{{ flight.airline }}">
+                            <input type="hidden" name="flight_no" value="{{ flight.flight_no }}">
+                            <input type="hidden" name="from_city" value="{{ flight.from }}">
+                            <input type="hidden" name="to_city" value="{{ flight.to }}">
+                            <input type="hidden" name="departure" value="{{ flight.departure_raw }}">
+                            <input type="hidden" name="arrival" value="{{ flight.arrival_raw }}">
+                            <input type="hidden" name="price" value="{{ flight.price }}">
+                            <input type="hidden" name="status" value="{{ flight.status }}">
+                            <button class="btn book-btn" type="submit"
+                                style="margin-top:0; padding: 10px 30px; background:var(--accent);">
+                                Book
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+
+                </div>
+
+                <div class="bus-offer-strip"
+                    style="background: rgba(34, 116, 224, 0.05); color: var(--secondary); border-top: 1px dashed rgba(34, 116, 224, 0.3);">
+                    ✨ Get up to ₹{{ flight.promo_amount }} off on {{ flight.promo_bank }} Credit Cards
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+    </div>
+
+
+</body>
+
+</html>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Wallet | Travexa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body style="display:flex; flex-direction:column; align-items:center;">
+
+<header class="main-header" style="width:100%; box-sizing:border-box; margin-bottom: 20px;">
+    <h1>My Wallet</h1>
+    <a href="/home" class="logout-link">Dashboard</a>
+</header>
+
+<div class="wallet-card text-center" style="margin-top:40px;">
+    <p class="text-muted" style="font-weight:600;">Available Balance</p>
+    <div class="amount">
+        ₹ {{ "{:,}".format(balance) }}
+    </div>
+
+
+</div>
+
+</body>
+</html>

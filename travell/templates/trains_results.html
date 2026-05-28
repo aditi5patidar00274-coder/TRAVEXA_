@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Train Results | Travexa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* Modern Clean Background for Results */
+        body {
+            background: #f4f7fe;
+            color: var(--text-main);
+        }
+
+        .main-header {
+            background: #fff;
+            border-bottom: 1px solid var(--border);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="main-header"
+        style="margin-bottom: 20px; padding: 15px; display:flex; justify-content:space-between; align-items:center;">
+        <h1 style="color:#000; font-size:1.8rem; margin:0; padding-left:20px;">
+            <span class="brand-box"
+                style="padding: 4px 12px; border-radius: 8px; font-size:1.5rem; transform:none; margin-right:4px; background: #ef4444; color: white;">TRAV</span>exa
+            <span style="font-weight:400; font-size:1.2rem; color: #6b7280; font-family: Inter;">trains</span>
+        </h1>
+        <a href="/home" class="logout-link" style="top:25px; right:20px;">Dashboard</a>
+    </header>
+
+    <div style="max-width:1200px; margin:0 auto; padding:0 20px 20px;">
+        <h2 style="font-size: 2.2rem; color:var(--text-main); margin-bottom:10px;">{{ from_city }} ➔ {{ to_city }}</h2>
+    </div>
+
+
+    {% if api_error %}
+    <div
+        style="max-width:800px; margin: 40px auto; padding: 25px; background: #FEF2F2; border: 1px solid #FCA5A5; border-radius: 12px; text-align: center;">
+        <h3 style="color: #991B1B; margin-bottom: 10px;">⚠️ API Problem Detected</h3>
+        <p style="color: #B91C1C; font-weight: 500;">{{ api_error }}</p>
+        <p style="margin-top:15px; font-size:0.9rem; color: #7F1D1D;">Note: Real-time search is currently mandatory.
+            Please verify your RapidAPI subscription.</p>
+        <a href="/trains" class="btn back-btn" style="margin-top:20px;">Try Different Search</a>
+    </div>
+    {% endif %}
+
+    {% if no_match and not api_error %}
+    <p class="page-title text-center" style="color:var(--accent); margin-top:50px;">
+        No trains available for this route right now.
+    </p>
+    {% endif %}
+
+    <div style="max-width:1200px; margin:0 auto; padding: 0 20px 60px;" id="trainsList">
+        {% for train in trains %}
+        <div style="margin-bottom: 30px;">
+            <div class="bus-horizontal-card"
+                style="margin-bottom: 0; border-bottom-left-radius:0; border-bottom-right-radius:0;">
+
+                <div class="bus-details-left">
+                    <div class="bus-title">{{ train.operator }}</div>
+                    <div style="color:var(--text-muted); font-size:0.9rem; margin-bottom:10px;">
+                        Train No: {{ train.train_no }}
+                    </div>
+                </div>
+
+                <div class="bus-details-middle">
+                    <div>
+                        <div class="bus-time-large" style="font-size: 1.3rem;">{{
+                            train.departure_display.split('|')[1].strip() }}</div>
+                        <div style="font-size:0.85rem; color:var(--text-muted);">{{
+                            train.departure_display.split('|')[0].strip() }}</div>
+                        <div style="font-size:0.9rem; font-weight:700; color:var(--text-main); margin-top:4px;">{{
+                            train.from }}</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div class="bus-duration-badge"
+                            style="background:#f0f7ff; color:var(--primary); font-weight:600;">{{ train.duration }} •
+                            {{ train.class }}</div>
+                        <div style="margin-top:5px; color:#D1D5DB; letter-spacing:2px;">────────</div>
+                        <div style="font-size: 0.8rem; color: var(--primary); font-weight:600; margin-top:5px;">{{
+                            train.seats_available }} Seats Left</div>
+                    </div>
+                    <div>
+                        <div class="bus-time-large" style="font-size: 1.3rem;">{{
+                            train.arrival_display.split('|')[1].strip() }}</div>
+                        <div style="font-size:0.85rem; color:var(--text-muted);">{{
+                            train.arrival_display.split('|')[0].strip() }}</div>
+                        <div style="font-size:0.9rem; font-weight:700; color:var(--text-main); margin-top:4px;">{{
+                            train.to }}</div>
+                    </div>
+                </div>
+
+                <div class="bus-details-right">
+                    <div style="color:var(--text-muted); font-size:0.85rem;">All inclusive fare</div>
+                    <div>
+                        <span class="bus-price-final">₹{{ "{:,}".format(train.price) }}</span>
+                    </div>
+
+                    {% if train.status == "Available" %}
+                    <form method="POST" action="/enter-passenger" style="margin-top:10px;">
+                        <input type="hidden" name="airline" value="{{ train.operator }}">
+                        <input type="hidden" name="flight_no" value="{{ train.train_no }}">
+                        <input type="hidden" name="from_city" value="{{ train.from }}">
+                        <input type="hidden" name="to_city" value="{{ train.to }}">
+                        <input type="hidden" name="departure" value="{{ train.departure_raw }}">
+                        <input type="hidden" name="arrival" value="{{ train.arrival_raw }}">
+                        <input type="hidden" name="price" value="{{ train.price }}">
+                        <input type="hidden" name="status" value="{{ train.status }}">
+
+                        <button class="btn book-btn" type="submit" style="margin-top:0; padding: 10px 30px;">
+                            Book
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+
+            </div>
+
+        </div>
+        {% endfor %}
+    </div>
+
+</body>
+
+</html>
+
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Secure Payment | Travexa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .invoice-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border);
+            text-align: left;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+        .invoice-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            align-items: center;
+        }
+        .invoice-total {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border);
+            color: var(--text-main);
+            font-size: 1.2rem;
+            font-weight: 800;
+        }
+        .highlight-green {
+            color: #10B981;
+            font-size: 0.85rem;
+            background: rgba(16, 185, 129, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body style="background: var(--background);">
+
+<div class="form-card text-center" style="max-width: 500px;">
+
+    <h2 class="page-title" style="margin-top:0;">🔒 Secure Checkout</h2>
+    
+    <div class="invoice-card">
+        <h4 style="margin-top:0; color:var(--text-main); margin-bottom: 20px;">Fare Summary</h4>
+        
+        <div class="invoice-row">
+            <span>Base Fare (Adult x 1)</span>
+            <span style="color:var(--text-main);">₹{{ "{:,.2f}".format(base_fare) }}</span>
+        </div>
+        
+
+        
+        <div class="invoice-row">
+            <span>Convenience Fee <span class="highlight-green">Included</span></span>
+            <span style="color:var(--text-main);">₹{{ "{:,.2f}".format(convenience_fee) }}</span>
+        </div>
+        
+        <div class="invoice-total">
+            <span>Total Amount</span>
+            <span style="color:var(--primary); font-size:1.5rem;">₹{{ "{:,.2f}".format(total_amount) }}</span>
+        </div>
+        <p style="text-align:right; font-size:0.75rem; color:var(--text-muted); margin-top:5px;">* Non-refundable Convenience Fee</p>
+    </div>
+    
+    <form action="/process-payment" method="POST">
+        <p class="mt-8 mb-4" style="font-weight:600; text-align:left;">Select Payment Method:</p>
+
+        <div class="pay-box">
+            <label><input type="radio" name="method" value="Card" required> 💳 Credit / Debit Card</label>
+            <label><input type="radio" name="method" value="UPI"> 📱 UPI</label>
+            <label><input type="radio" name="method" value="Net Banking"> 🏦 Net Banking</label>
+            <label><input type="radio" name="method" value="Wallet"> 💰 Travexa e-Wallet</label>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-4" style="font-size:1.1rem; padding: 15px;">
+            Pay ₹{{ "{:,.0f}".format(total_amount) }}
+        </button>
+    </form>
+    
+    <button class="btn back-btn" onclick="history.back()">
+        ⬅ Go Back
+    </button>
+
+</div>
+
+</body>
+</html>

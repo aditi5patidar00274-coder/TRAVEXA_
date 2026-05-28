@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Search Trains | Travexa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .search-page {
+            background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
+            url("{{ url_for('static', filename='images/train_bg.jpg.png') }}") no-repeat center center fixed !important;
+            background-size: cover !important;
+        }
+
+        .search-page::before {
+            display: none !important;
+        }
+
+        .ixigo-search-box {
+            display: flex;
+            flex-direction: row;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .ixigo-input-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 10px 15px;
+            border-right: 1px solid var(--border);
+        }
+
+        .ixigo-input-group:last-child {
+            border-right: none;
+        }
+
+        .ixigo-input-group label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .ixigo-input-group input {
+            border: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            font-size: 1.5rem !important;
+            font-weight: 800 !important;
+            color: var(--text-main) !important;
+            background: transparent !important;
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
+        .ixigo-input-group input::placeholder {
+            color: #ccc;
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .ixigo-search-box {
+                flex-direction: column;
+            }
+
+            .ixigo-input-group {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+        }
+    </style>
+</head>
+
+<body class="search-page">
+
+    <header class="main-header"
+        style="background:#fff; border-bottom:1px solid var(--border); padding:15px; text-align:left; box-shadow:none; margin-bottom:50px; display:flex; justify-content:space-between; align-items:center;">
+        <h1 style="color:#000; font-size:1.8rem; margin:0; padding-left:20px;">
+            <span class="brand-box"
+                style="padding: 4px 12px; border-radius: 8px; font-size:1.5rem; transform:none; margin-right:4px; background: #ef4444; color: white;">TRAV</span>exa
+            <span style="font-weight:400; font-size:1.2rem; color: #6b7280;">trains</span>
+        </h1>
+        <a href="/home" class="btn btn-primary"
+            style="width:auto; padding:8px 20px; font-size:0.9rem; margin-right:20px; background: #2274e0; border-color: #2274e0;">Back
+            to Dashboard</a>
+    </header>
+
+    <div style="max-width:1000px; margin:0 auto; padding:0 20px;">
+
+        <h2 style="font-size: 2.2rem; margin-bottom: 30px; text-align: center; color:white">Search Trains</h2>
+
+        <form method="POST" action="/search-trains"
+            style="background:rgba(255, 255, 255, 0.95); padding:30px; border-radius:16px; box-shadow:0 8px 24px rgba(0,0,0,0.15);">
+
+            <div class="ixigo-search-box">
+                <div class="ixigo-input-group">
+                    <label>From</label>
+                    <input type="text" name="from_city" placeholder="NDLS" required style="text-transform:uppercase;">
+                    <span style="font-size:0.8rem; color:var(--text-muted); margin-top:5px;">Station Code</span>
+                </div>
+
+                <div class="ixigo-input-group">
+                    <label>To</label>
+                    <input type="text" name="to_city" placeholder="BCT" required style="text-transform:uppercase;">
+                    <span style="font-size:0.8rem; color:var(--text-muted); margin-top:5px;">Station Code</span>
+                </div>
+
+                <div class="ixigo-input-group">
+                    <label>Date of Journey</label>
+                    <input type="date" name="date" required style="font-size:1.1rem !important;">
+                </div>
+
+                <div class="ixigo-input-group" style="flex: 0.5; display:flex; justify-content:center; padding:0 10px;">
+                    <button type="submit" class="btn btn-primary"
+                        style="font-size: 1.2rem; padding: 15px 30px; background: #2274e0; border:none;">Search</button>
+                </div>
+            </div>
+
+        </form>
+
+        <div id="loader" style="display:none; margin-top:50px; color:white; text-align:center;">
+            <div class="spinner" style="border-top-color:white;"></div>
+            <p style="margin-top:20px; font-weight:600;">Searching Indian Railways... Please wait</p>
+        </div>
+
+    </div>
+
+    <script>
+        document.querySelector("form").addEventListener("submit", function () {
+            document.getElementById("loader").style.display = "block";
+        });
+
+        // Set date constraints
+        const dateInput = document.querySelector('input[name="date"]');
+        const today = new Date().toISOString().split('T')[0];
+        const twoMonthsFromNow = new Date();
+        twoMonthsFromNow.setMonth(twoMonthsFromNow.getMonth() + 2);
+        const twoMonthsStr = twoMonthsFromNow.toISOString().split('T')[0];
+
+        dateInput.setAttribute('min', today);
+        dateInput.setAttribute('max', twoMonthsStr);
+        // Default to today
+        if (!dateInput.value) dateInput.value = today;
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>My Bookings | Travexa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <header class="main-header" style="margin-bottom: 20px;">
+        <h1>My Bookings</h1>
+        <a href="/home" class="logout-link">Dashboard</a>
+    </header>
+
+    {% if bookings|length == 0 %}
+    <p class="page-title text-center text-muted">
+        No bookings yet.
+    </p>
+    {% endif %}
+
+    <div class="booking-container">
+
+        {% for booking in bookings %}
+        <div class="booking-card">
+
+            <strong>{{ booking.airline }} ({{ booking.flight_no }})</strong>
+
+            <div class="flight-info">
+
+                <span style="font-weight: 600;">{{ booking.from_city }} → {{ booking.to_city }}</span>
+            </div>
+
+            <div class="flight-details text-muted mt-4">
+                <p><strong>Departure:</strong> {{ booking.departure }}</p>
+                <p><strong>Arrival:</strong> {{ booking.arrival }}</p>
+            </div>
+
+            <p class="price mt-4">₹ {{ "{:,}".format(booking.price) }}</p>
+
+            <div class="status {% if booking.booking_status == 'Cancelled' %}cancelled{% else %}confirmed{% endif %}">
+                {{ booking.booking_status or "Confirmed" }}
+            </div>
+
+            {% if booking.booking_status == "Cancelled" %}
+            <div class="refund text-muted {% if 'Refunded' in booking.refund_status %}refund-done{% else %}refund-none{% endif %} mt-4 push-to-bottom"
+                style="font-size:14px;">
+                Refund Status: {{ booking.refund_status or "Not Cancelled"}}
+            </div>
+            {% endif %}
+
+            <!-- Cancel Button -->
+            {% if booking.booking_status != "Cancelled" %}
+            <form method="POST" action="/cancel-booking" class="mt-4 push-to-bottom">
+                <input type="hidden" name="booking_id" value="{{ booking.id }}">
+                <button type="submit" class="btn cancel-btn">
+                    Cancel Booking
+                </button>
+            </form>
+            {% endif %}
+
+        </div>
+        {% endfor %}
+
+    </div>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+
+    <div id="popup" class="modal" style="display:block;">
+        <div class="modal-content">
+            <h2>✅ Success</h2>
+            <p class="mb-4">{{ messages[0] }}</p>
+            <button onclick="closePopup()" class="btn btn-primary">
+                OK
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function closePopup() {
+            document.getElementById("popup").style.display = "none";
+        }
+    </script>
+
+    {% endif %}
+    {% endwith %}
+</body>
+
+</html>
